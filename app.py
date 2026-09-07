@@ -11,6 +11,8 @@ load_dotenv()
 
 app = FastAPI()
 
+model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -31,10 +33,15 @@ class AIRequest(BaseModel):
     content: str
 
 
+@app.get("/")
+def health_check():
+    return {"status": "ok", "service": "chatbot-integration"}
+
+
 @app.post("/api/ai/generate")
 def generate_content(request: AIRequest):
     response = client.models.generate_content(
-        model="gemini-3.6-flash",
+        model=model_name,
         config=types.GenerateContentConfig(
             system_instruction=request.system_prompt,
             temperature=0.4,
