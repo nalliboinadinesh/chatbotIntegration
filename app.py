@@ -11,7 +11,7 @@ load_dotenv()
 
 app = FastAPI()
 
-model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+model_name = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
 
 app.add_middleware(
     CORSMiddleware,
