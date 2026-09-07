@@ -1,4 +1,7 @@
 import os
+import threading
+import time
+from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -9,7 +12,22 @@ from pydantic import BaseModel
 
 load_dotenv()
 
-app = FastAPI()
+EIGHT_MINUTES = 8 * 60
+
+
+def log_time_every_eight_minutes():
+    while True:
+        time.sleep(EIGHT_MINUTES)
+        print(f"Cron time: {time.strftime('%Y-%m-%dT%H:%M:%S%z')}", flush=True)
+
+
+@asynccontextmanager
+async def lifespan(_app):
+    threading.Thread(target=log_time_every_eight_minutes, daemon=True).start()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 model_name = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
 
